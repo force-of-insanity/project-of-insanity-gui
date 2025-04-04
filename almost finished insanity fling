@@ -1,0 +1,211 @@
+-- Variables
+local Targets = {}
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local AllBool = false
+local isRunning = false
+local startPos = nil
+
+local GetPlayer = function(Name)
+    Name = Name:lower()
+    if Name == "all" or Name == "others" then
+        AllBool = true
+        return
+    elseif Name == "random" then
+        local GetPlayers = Players:GetPlayers()
+        if table.find(GetPlayers, Player) then table.remove(GetPlayers, table.find(GetPlayers, Player)) end
+        return GetPlayers[math.random(#GetPlayers)]
+    else
+        for _, x in next, Players:GetPlayers() do
+            if x ~= Player then
+                if x.Name:lower():match("^" .. Name) or x.DisplayName:lower():match("^" .. Name) then
+                    return x
+                end
+            end
+        end
+    end
+end
+
+local Message = function(_Title, _Text, Time)
+    game:GetService("StarterGui"):SetCore("SendNotification", {Title = _Title, Text = _Text, Duration = Time})
+end
+
+local SkidFling = function(TargetPlayer)
+    local Character = Player.Character
+    local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+    local RootPart = Humanoid and Humanoid.RootPart
+    local TCharacter = TargetPlayer.Character
+    local THumanoid = TCharacter and TCharacter:FindFirstChildOfClass("Humanoid")
+    local TRootPart = THumanoid and THumanoid.RootPart
+    local THead = TCharacter:FindFirstChild("Head")
+    local Accessory = TCharacter:FindFirstChildOfClass("Accessory")
+    local Handle = Accessory and Accessory:FindFirstChild("Handle")
+
+    if not (Character and Humanoid and RootPart) then return end
+
+    if RootPart.Velocity.Magnitude < 50 then getgenv().OldPos = RootPart.CFrame end
+    if THumanoid and THumanoid.Sit and not AllBool then return Message("Error", "Target is sitting", 5) end
+
+    workspace.CurrentCamera.CameraSubject = THead or Handle or THumanoid
+
+    local function FPos(BasePart, Pos, Ang)
+        RootPart.CFrame = CFrame.new(BasePart.Position) * Pos * Ang
+        Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * Pos * Ang)
+        RootPart.Velocity = Vector3.new(9e7, 9e7 * 10, 9e7)
+        RootPart.RotVelocity = Vector3.new(9e8, 9e8, 9e8)
+    end
+
+    local function SFBasePart(BasePart)
+        local TimeToWait, Time, Angle = 2, tick(), 0
+        repeat
+            if not (RootPart and THumanoid) then break end
+            if BasePart.Velocity.Magnitude < 50 then
+                Angle += 100
+                for _, offset in ipairs({
+                    CFrame.new(0, 1.5, 0),
+                    CFrame.new(0, -1.5, 0),
+                    CFrame.new(2.25, 1.5, -2.25),
+                    CFrame.new(-2.25, -1.5, 2.25)
+                }) do
+                    FPos(BasePart, offset + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                    task.wait()
+                end
+            else
+                for _, offset in ipairs({
+                    CFrame.new(0, 1.5, THumanoid.WalkSpeed),
+                    CFrame.new(0, -1.5, -THumanoid.WalkSpeed),
+                    CFrame.new(0, 1.5, TRootPart.Velocity.Magnitude / 1.25),
+                    CFrame.new(0, -1.5, -TRootPart.Velocity.Magnitude / 1.25)
+                }) do
+                    FPos(BasePart, offset, CFrame.Angles(math.rad(90), 0, 0))
+                    task.wait()
+                end
+            end
+        until BasePart.Velocity.Magnitude > 500 or not TargetPlayer.Character or tick() > Time + TimeToWait
+    end
+
+    workspace.FallenPartsDestroyHeight = 0 / 0
+
+    local BV = Instance.new("BodyVelocity", RootPart)
+    BV.Name, BV.Velocity, BV.MaxForce = "EpixVel", Vector3.new(9e8, 9e8, 9e8), Vector3.new(1 / 0, 1 / 0, 1 / 0)
+    Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+
+    if TRootPart and THead and (TRootPart.Position - THead.Position).Magnitude > 5 then
+        SFBasePart(THead)
+    else
+        SFBasePart(TRootPart or THead)
+    end
+
+    task.wait(0.5)
+    BV:Destroy()
+end
+
+-- GUI SETUP
+local Converted = {
+	["_ScreenGui"] = Instance.new("ScreenGui");
+	["_Frame"] = Instance.new("Frame");
+	["_TextLabel"] = Instance.new("TextLabel");
+}
+
+Converted["_ScreenGui"].ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+Converted["_ScreenGui"].Parent = game:GetService("CoreGui")
+
+local Frame = Converted["_Frame"]
+Frame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+Frame.Position = UDim2.new(0.433, 0, 0.136, 0)
+Frame.Size = UDim2.new(0, 183, 0, 312)
+Frame.Active = true
+Frame.Draggable = true
+Frame.Parent = Converted["_ScreenGui"]
+
+local Title = Converted["_TextLabel"]
+Title.Font = Enum.Font.Unknown
+Title.Text = "insanity fling"
+Title.TextColor3 = Color3.fromRGB(35, 39, 255)
+Title.TextSize = 22
+Title.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+Title.Size = UDim2.new(0, 183, 0, 42)
+Title.Parent = Frame
+
+-- Add UI Elements into Frame
+local function AddButton(text, posY, callback)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0, 160, 0, 30)
+	btn.Position = UDim2.new(0.5, -80, 0, posY)
+	btn.Text = text
+	btn.Parent = Frame
+	btn.MouseButton1Click:Connect(callback)
+	return btn
+end
+
+local TargetBox = Instance.new("TextBox")
+TargetBox.Size = UDim2.new(0, 160, 0, 30)
+TargetBox.Position = UDim2.new(0.5, -80, 0, 50)
+TargetBox.PlaceholderText = "Enter Target Name"
+TargetBox.Parent = Frame
+
+local TargetLabel = Instance.new("TextLabel")
+TargetLabel.Size = UDim2.new(0, 160, 0, 25)
+TargetLabel.Position = UDim2.new(0.5, -80, 0, 85)
+TargetLabel.Text = "Targets Found: 0"
+TargetLabel.BackgroundTransparency = 1
+TargetLabel.TextColor3 = Color3.new(1, 1, 1)
+TargetLabel.Parent = Frame
+
+AddButton("Add Target", 115, function()
+    local name = TargetBox.Text
+    if name and name ~= "" and not table.find(Targets, name) then
+        local player = GetPlayer(name)
+        if player then
+            table.insert(Targets, name)
+            TargetLabel.Text = "Targets Found: " .. #Targets
+        end
+    end
+end)
+
+AddButton("Clear Targets", 150, function()
+    Targets = {}
+    TargetLabel.Text = "Targets Found: 0"
+end)
+
+AddButton("Start Targeting", 185, function()
+    if not isRunning then
+        isRunning = true
+        startPos = Player.Character.HumanoidRootPart.Position
+        while isRunning do
+            for _, name in pairs(Targets) do
+                local p = GetPlayer(name)
+                if p then SkidFling(p) end
+            end
+            task.wait()
+        end
+    end
+end)
+
+AddButton("Fling All", 220, function()
+    if not isRunning then
+        isRunning = true
+        startPos = Player.Character.HumanoidRootPart.Position
+        while isRunning do
+            for _, p in pairs(Players:GetPlayers()) do
+                if p ~= Player then SkidFling(p) end
+            end
+            task.wait()
+        end
+    end
+end)
+
+AddButton("Stop", 255, function()
+    isRunning = false
+    workspace.CurrentCamera.CameraSubject = Player.Character:FindFirstChildOfClass("Humanoid")
+    local char = Player.Character
+    if char then
+        for _, part in pairs(char:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.Velocity = Vector3.new()
+                part.RotVelocity = Vector3.new()
+            end
+        end
+        char:SetPrimaryPartCFrame(CFrame.new(startPos))
+    end
+end)
