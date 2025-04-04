@@ -132,6 +132,10 @@ local function AddButton(text, posY, callback)
 	local btn = Instance.new("TextButton")
 	btn.Size = UDim2.new(0, 160, 0, 30)
 	btn.Position = UDim2.new(0.5, -80, 0, posY)
+	btn.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+	btn.TextColor3 = Color3.fromRGB(35, 39, 255)
+	btn.Font = Enum.Font.SourceSans
+	btn.TextSize = 20
 	btn.Text = text
 	btn.Parent = Frame
 	btn.MouseButton1Click:Connect(callback)
@@ -142,6 +146,10 @@ local TargetBox = Instance.new("TextBox")
 TargetBox.Size = UDim2.new(0, 160, 0, 30)
 TargetBox.Position = UDim2.new(0.5, -80, 0, 50)
 TargetBox.PlaceholderText = "Enter Target Name"
+TargetBox.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+TargetBox.TextColor3 = Color3.fromRGB(35, 39, 255)
+TargetBox.Font = Enum.Font.SourceSans
+TargetBox.TextSize = 20
 TargetBox.Parent = Frame
 
 local TargetLabel = Instance.new("TextLabel")
@@ -150,6 +158,8 @@ TargetLabel.Position = UDim2.new(0.5, -80, 0, 85)
 TargetLabel.Text = "Targets Found: 0"
 TargetLabel.BackgroundTransparency = 1
 TargetLabel.TextColor3 = Color3.new(1, 1, 1)
+TargetLabel.Font = Enum.Font.SourceSans
+TargetLabel.TextSize = 18
 TargetLabel.Parent = Frame
 
 AddButton("Add Target", 115, function()
@@ -209,3 +219,4 @@ AddButton("Stop", 255, function()
         char:SetPrimaryPartCFrame(CFrame.new(startPos))
     end
 end)
+
