@@ -1,0 +1,361 @@
+-- Variables
+local Targets = {} -- Start with an empty target list
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local AllBool = false
+local isRunning = false
+local startPos = nil -- variable to store the starting position
+
+-- Function to get a player by name
+local GetPlayer = function(Name)
+    Name = Name:lower()
+    if Name == "all" or Name == "others" then
+        AllBool = true
+        return
+    elseif Name == "random" then
+        local GetPlayers = Players:GetPlayers()
+        if table.find(GetPlayers, Player) then table.remove(GetPlayers, table.find(GetPlayers, Player)) end
+        return GetPlayers[math.random(#GetPlayers)]
+    elseif Name ~= "random" and Name ~= "all" and Name ~= "others" then
+        for _, x in next, Players:GetPlayers() do
+            if x ~= Player then
+                if x.Name:lower():match("^" .. Name) then
+                    return x
+                elseif x.DisplayName:lower():match("^" .. Name) then
+                    return x
+                end
+            end
+        end
+    else
+        return
+    end
+end
+
+-- Function to send a notification
+local Message = function(_Title, _Text, Time)
+    game:GetService("StarterGui"):SetCore("SendNotification", {Title = _Title, Text = _Text, Duration = Time})
+end
+
+-- Function to perform the fling action on a target player
+local SkidFling = function(TargetPlayer)
+    local Character = Player.Character
+    local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+    local RootPart = Humanoid and Humanoid.RootPart
+
+    local TCharacter = TargetPlayer.Character
+    local THumanoid
+    local TRootPart
+    local THead
+    local Accessory
+    local Handle
+
+    if TCharacter:FindFirstChildOfClass("Humanoid") then
+        THumanoid = TCharacter:FindFirstChildOfClass("Humanoid")
+    end
+    if THumanoid and THumanoid.RootPart then
+        TRootPart = THumanoid.RootPart
+    end
+    if TCharacter:FindFirstChild("Head") then
+        THead = TCharacter.Head
+    end
+    if TCharacter:FindFirstChildOfClass("Accessory") then
+        Accessory = TCharacter:FindFirstChildOfClass("Accessory")
+    end
+    if Accessory and Accessory:FindFirstChild("Handle") then
+        Handle = Accessory.Handle
+    end
+
+    if Character and Humanoid and RootPart then
+        if RootPart.Velocity.Magnitude < 50 then
+            getgenv().OldPos = RootPart.CFrame
+        end
+        if THumanoid and THumanoid.Sit and not AllBool then
+            return Message("Error Occurred", "Targeting is sitting", 5)
+        end
+        if THead then
+            workspace.CurrentCamera.CameraSubject = THead
+        elseif not THead and Handle then
+            workspace.CurrentCamera.CameraSubject = Handle
+        elseif THumanoid and TRootPart then
+            workspace.CurrentCamera.CameraSubject = THumanoid
+        end
+        if not TCharacter:FindFirstChildWhichIsA("BasePart") then
+            return
+        end
+        
+        local FPos = function(BasePart, Pos, Ang)
+            RootPart.CFrame = CFrame.new(BasePart.Position) * Pos * Ang
+            Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * Pos * Ang)
+            RootPart.Velocity = Vector3.new(9e7, 9e7 * 10, 9e7)
+            RootPart.RotVelocity = Vector3.new(9e8, 9e8, 9e8)
+        end
+        
+        local SFBasePart = function(BasePart)
+            local TimeToWait = 2
+            local Time = tick()
+            local Angle = 0
+
+            repeat
+                if RootPart and THumanoid then
+                    if BasePart.Velocity.Magnitude < 50 then
+                        Angle = Angle + 100
+                        FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(2.25, 1.5, -2.25) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(-2.25, -1.5, 2.25) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection, CFrame.Angles(math.rad(Angle), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection, CFrame.Angles(math.rad(Angle), 0, 0))
+                        task.wait()
+                    else
+                        FPos(BasePart, CFrame.new(0, 1.5, THumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5, -THumanoid.WalkSpeed), CFrame.Angles(0, 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, 1.5, THumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
+                        task.wait()
+                        
+                        FPos(BasePart, CFrame.new(0, 1.5, TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5, -TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(0, 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, 1.5, TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(math.rad(90), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5 ,0), CFrame.Angles(math.rad(-90), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(math.rad(90), 0, 0))
+                        task.wait()
+                    end
+                else
+                    break
+                end
+            until BasePart.Velocity.Magnitude > 500 or BasePart.Parent ~= TargetPlayer.Character or TargetPlayer.Parent ~= Players or not TargetPlayer.Character == TCharacter or THumanoid.Sit or Humanoid.Health <= 0 or tick() > Time + TimeToWait
+        end
+        
+        workspace.FallenPartsDestroyHeight = 0 / 0
+        
+        local BV = Instance.new("BodyVelocity")
+        BV.Name = "EpixVel"
+        BV.Parent = RootPart
+        BV.Velocity = Vector3.new(9e8, 9e8, 9e8)
+        BV.MaxForce = Vector3.new(1 / 0, 1 / 0, 1 / 0)
+        
+        Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+        
+        if TRootPart and THead then
+            if (TRootPart.CFrame.p - THead.CFrame.p).Magnitude > 5 then
+                SFBasePart(THead)
+            else
+                SFBasePart(TRootPart)
+            end
+        elseif TRootPart and not THead then
+            SFBasePart(TRootPart)
+        else
+            return
+        end
+
+        task.wait(0.5)
+        BV:Destroy()
+    else
+        return
+    end
+end
+
+-- Create a ScreenGui with Top ZIndexBehavior
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling -- Ensures layering works properly
+
+
+-- Target GUI Button
+local TargetGuiButton = Instance.new("TextButton")
+TargetGuiButton.Parent = ScreenGui
+TargetGuiButton.Text = "Toggle Target GUI"
+TargetGuiButton.Size = UDim2.new(0, 200, 0, 50)
+TargetGuiButton.Position = UDim2.new(1, -210, 0, 10)
+
+-- Target Frame
+local TargetFrame = Instance.new("Frame")
+TargetFrame.Parent = ScreenGui
+TargetFrame.Size = UDim2.new(0, 300, 0, 250)
+TargetFrame.Position = UDim2.new(0, 10, 0.5, -125) -- Positioned on the left side
+TargetFrame.Visible = false
+
+-- Target Textbox
+local TargetTextbox = Instance.new("TextBox")
+TargetTextbox.Parent = TargetFrame
+TargetTextbox.Size = UDim2.new(0, 200, 0, 40)
+TargetTextbox.Position = UDim2.new(0.5, -100, 0, 20)
+TargetTextbox.Text = "Enter Target Name"
+
+-- Target Count Label
+local TargetCountLabel = Instance.new("TextLabel")
+TargetCountLabel.Parent = TargetFrame
+TargetCountLabel.Size = UDim2.new(0, 200, 0, 40)
+TargetCountLabel.Position = UDim2.new(0.5, -100, 0, 70)
+TargetCountLabel.Text = "Targets Found: 0"
+
+-- Start Targeting Button
+local StartTargetingButton = Instance.new("TextButton")
+StartTargetingButton.Parent = TargetFrame
+StartTargetingButton.Text = "Start Targeting"
+StartTargetingButton.Size = UDim2.new(0, 200, 0, 40)
+StartTargetingButton.Position = UDim2.new(0.5, -100, 0, 120)
+
+-- Clear Target List Button
+local ClearTargetListButton = Instance.new("TextButton")
+ClearTargetListButton.Parent = TargetFrame
+ClearTargetListButton.Text = "Clear Target List"
+ClearTargetListButton.Size = UDim2.new(0, 200, 0, 40)
+ClearTargetListButton.Position = UDim2.new(0.5, -100, 0, 160)
+
+-- Start Button (Fling All Button)
+local StartButton = Instance.new("TextButton")
+StartButton.Parent = ScreenGui
+StartButton.Text = "Start Fling All"
+StartButton.Size = UDim2.new(0, 200, 0, 50)
+StartButton.Position = UDim2.new(1, -210, 0.5, -70)
+
+-- Toggle visibility of Target Frame
+TargetGuiButton.MouseButton1Click:Connect(function()
+    TargetFrame.Visible = not TargetFrame.Visible
+end)
+
+-- Start Targeting Button Logic
+StartTargetingButton.MouseButton1Click:Connect(function()
+    if not isRunning then
+        isRunning = true
+        startPos = Player.Character.HumanoidRootPart.Position -- store starting position
+
+        -- Fire the targeting loop repeatedly until stopped
+        while isRunning do
+            for _, targetName in next, Targets do
+                local targetPlayer = GetPlayer(targetName)
+                if targetPlayer then
+                    SkidFling(targetPlayer)
+                end
+            end
+            task.wait() -- wait before restarting the loop
+        end
+    end
+end)
+
+-- Start Fling All Button Logic
+StartButton.MouseButton1Click:Connect(function()
+    if not isRunning then
+        isRunning = true
+        startPos = Player.Character.HumanoidRootPart.Position -- store starting position
+
+        -- Fire fling all loop repeatedly until stopped
+        while isRunning do
+            for _, targetPlayer in pairs(Players:GetPlayers()) do
+                if targetPlayer and targetPlayer ~= Player then
+                    SkidFling(targetPlayer)
+                end
+            end
+            task.wait() -- wait before restarting the loop
+        end
+    end
+end)
+
+-- Clear Target List Button Logic
+ClearTargetListButton.MouseButton1Click:Connect(function()
+    Targets = {} -- reset target list
+    TargetCountLabel.Text = "Targets Found: 0"
+end)
+
+-- Function to update the Target List when a target name is entered
+TargetTextbox.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        local TargetName = TargetTextbox.Text
+        if TargetName and TargetName ~= "" then
+            local TargetPlayer = GetPlayer(TargetName)
+            if TargetPlayer then
+                -- Add the player to the target list if not already added
+                if not table.find(Targets, TargetName) then
+                    table.insert(Targets, TargetName)
+                    TargetCountLabel.Text = "Targets Found: " .. #Targets
+                end
+            end
+        end
+    end
+end)
+
+-- Setup the Stop Button on the Right Side
+local StopButton = Instance.new("TextButton")
+StopButton.Parent = ScreenGui
+StopButton.Text = "Stop"
+StopButton.Size = UDim2.new(0, 200, 0, 50)
+StopButton.Position = UDim2.new(1, -210, 0.5, -30)
+
+StopButton.MouseButton1Click:Connect(function()
+    isRunning = false
+    -- Reset camera view to local player
+    workspace.CurrentCamera.CameraSubject = Player.Character.Humanoid
+    
+    -- Reset player velocity and teleport back to starting position
+    local Character = Player.Character
+    if Character then
+        for _, part in pairs(Character:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.Velocity = Vector3.new() -- reset velocity
+                part.RotVelocity = Vector3.new() -- reset rotational velocity
+            end
+        end
+        Character:SetPrimaryPartCFrame(CFrame.new(startPos)) -- teleport back to start position
+    end
+end)
+
+-- Create the Toggle Button
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Parent = ScreenGui
+ToggleButton.Text = ""
+ToggleButton.Size = UDim2.new(0, 10, 0, 10)
+ToggleButton.Position = UDim2.new(0, 10, 0.5, -5) -- Left side, vertically centered
+ToggleButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Red by default
+ToggleButton.BorderSizePixel = 1
+ToggleButton.ZIndex = 10 -- High ZIndex to ensure it stays above other elements
+
+-- Variable to keep track of the toggle state
+local IsVisible = true
+
+-- Function to toggle visibility of other GUI elements
+local function ToggleVisibility()
+    IsVisible = not IsVisible
+    ToggleButton.BackgroundColor3 = IsVisible and Color3.new(0, 1, 0) or Color3.new(1, 0, 0) -- Green for visible, red for hidden
+
+    -- Iterate through all children of ScreenGui and toggle visibility
+    for _, child in ipairs(ScreenGui:GetChildren()) do
+        if child ~= ToggleButton then
+            child.Visible = IsVisible
+        end
+    end
+end
+
+-- Connect the toggle function to the button click
+ToggleButton.MouseButton1Click:Connect(ToggleVisibility)
