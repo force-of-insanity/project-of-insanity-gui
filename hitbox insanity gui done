@@ -1,0 +1,204 @@
+-- GUI with Buttons in Draggable Frame (Toggle Removed)
+
+-- Instances:
+local Converted = {
+	["_ScreenGui"] = Instance.new("ScreenGui"),
+	["_Frame"] = Instance.new("Frame"),
+	["_TextLabel"] = Instance.new("TextLabel")
+}
+
+-- Properties:
+Converted["_ScreenGui"].ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+Converted["_ScreenGui"].Parent = game:GetService("CoreGui")
+
+Converted["_Frame"].BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Converted["_Frame"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+Converted["_Frame"].BorderSizePixel = 0
+Converted["_Frame"].Position = UDim2.new(0.445, 0, 0.169, 0)
+Converted["_Frame"].Size = UDim2.new(0, 204, 0, 330)
+Converted["_Frame"].Parent = Converted["_ScreenGui"]
+Converted["_Frame"].Active = true
+Converted["_Frame"].Draggable = true -- Enable dragging
+
+Converted["_TextLabel"].Font = Enum.Font.Unknown
+Converted["_TextLabel"].Text = "Insanity HitBox"
+Converted["_TextLabel"].TextColor3 = Color3.fromRGB(35, 39, 255)
+Converted["_TextLabel"].TextSize = 20
+Converted["_TextLabel"].BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+Converted["_TextLabel"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+Converted["_TextLabel"].BorderSizePixel = 0
+Converted["_TextLabel"].Size = UDim2.new(0, 204, 0, 50)
+Converted["_TextLabel"].Parent = Converted["_Frame"]
+
+-- Reference the frame for parenting
+local ParentFrame = Converted["_Frame"]
+
+-- Function to create UI elements in the frame
+local function createUIElement(class, properties)
+    local element = Instance.new(class)
+    for property, value in pairs(properties) do
+        element[property] = value
+    end
+    element.Parent = ParentFrame
+    return element
+end
+
+-- TextBox for size input
+local TextBox = createUIElement("TextBox", {
+    Size = UDim2.new(0, 180, 0, 30),
+    Position = UDim2.new(0, 12, 0, 60),
+    PlaceholderText = "Enter Size",
+    TextScaled = true,
+    TextColor3 = Color3.fromRGB(35, 39, 255),
+    BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+})
+
+-- Buttons Setup
+local startY = 100
+local spacing = 35
+local buttons = {
+    {name = "HitboxNonFriends", text = "Hitbox Non-Friends"},
+    {name = "HitboxAll", text = "Hitbox All"},
+    {name = "LoopHitboxNonFriends", text = "Loop Hitbox Non-Friends [OFF]"},
+    {name = "LoopHitboxAll", text = "Loop Hitbox All [OFF]"},
+    {name = "HitboxNPCs", text = "Hitbox NPCs"},
+    {name = "LoopHitboxNPCs", text = "Loop Hitbox NPCs [OFF]"}
+}
+
+local UIButtons = {}
+for i, btn in ipairs(buttons) do
+    UIButtons[btn.name] = createUIElement("TextButton", {
+        Size = UDim2.new(0, 180, 0, 30),
+        Position = UDim2.new(0, 12, 0, startY + (i - 1) * spacing),
+        Text = btn.text,
+        TextColor3 = Color3.fromRGB(35, 39, 255),
+        BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+    })
+end
+
+-- Gameplay Logic:
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local function findHumanoidRootPart(character)
+    if character then
+        for _, part in ipairs(character:GetChildren()) do
+            if part:IsA("BasePart") and part.Name:lower():find("humanoidroot") then
+                return part
+            end
+        end
+    end
+    return nil
+end
+
+local function adjustHPRSize(target, size)
+    if target and target ~= LocalPlayer.Character then
+        local humanoidRootPart = findHumanoidRootPart(target)
+        if humanoidRootPart and humanoidRootPart.Size ~= Vector3.new(size, size, size) then
+            humanoidRootPart.Size = Vector3.new(size, size, size)
+            humanoidRootPart.CanCollide = false 
+        end
+    end
+end
+
+local function manageOutline(target, apply)
+    local humanoidRootPart = findHumanoidRootPart(target)
+    if humanoidRootPart then
+        local outline = humanoidRootPart:FindFirstChildOfClass("SelectionBox")
+        if apply then
+            if not outline then
+                outline = Instance.new("SelectionBox")
+                outline.Adornee = humanoidRootPart
+                outline.Parent = humanoidRootPart
+                outline.LineThickness = 0.05
+                outline.Color3 = Color3.fromRGB(35, 39, 255)
+                outline.Transparency = 0.5
+                outline.ZIndex = 10
+            end
+        else
+            if outline then
+                outline:Destroy()
+            end
+        end
+    end
+end
+
+local function findAllNPCs()
+    local npcs = {}
+    for _, descendant in pairs(workspace:GetDescendants()) do
+        if descendant:IsA("Model") and findHumanoidRootPart(descendant) then
+            if not Players:GetPlayerFromCharacter(descendant) then
+                table.insert(npcs, descendant)
+            end
+        end
+    end
+    return npcs
+end
+
+local function applyHitboxToNPCs()
+    local size = tonumber(TextBox.Text) or 50
+    for _, npc in pairs(findAllNPCs()) do
+        adjustHPRSize(npc, size)
+        manageOutline(npc, true)
+    end
+end
+
+local function applyHitboxToPlayers(filter)
+    local size = tonumber(TextBox.Text) or 50
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and (filter == "all" or (filter == "nonfriends" and not LocalPlayer:IsFriendsWith(player.UserId))) then
+            adjustHPRSize(player.Character, size)
+            manageOutline(player.Character, true)
+        end
+    end
+end
+
+-- Button bindings
+UIButtons.HitboxNonFriends.MouseButton1Click:Connect(function()
+    applyHitboxToPlayers("nonfriends")
+end)
+
+UIButtons.HitboxAll.MouseButton1Click:Connect(function()
+    applyHitboxToPlayers("all")
+end)
+
+UIButtons.HitboxNPCs.MouseButton1Click:Connect(function()
+    applyHitboxToNPCs()
+end)
+
+-- Toggle loop buttons
+local loopStates = {}
+local function toggleLoop(button, filter)
+    loopStates[filter] = false
+    button.MouseButton1Click:Connect(function()
+        loopStates[filter] = not loopStates[filter]
+        button.Text = (filter == "npcs" and "Loop Hitbox NPCs" or ("Loop Hitbox " .. (filter == "all" and "All" or "Non-Friends"))) ..
+                      (loopStates[filter] and " [ON]" or " [OFF]")
+        while loopStates[filter] do
+            if filter == "npcs" then
+                applyHitboxToNPCs()
+            else
+                applyHitboxToPlayers(filter)
+            end
+            wait(1)
+        end
+    end)
+end
+
+toggleLoop(UIButtons.LoopHitboxNonFriends, "nonfriends")
+toggleLoop(UIButtons.LoopHitboxAll, "all")
+toggleLoop(UIButtons.LoopHitboxNPCs, "npcs")
+
+-- Cleanup outlines on respawn
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(character)
+        wait(0.5)
+        manageOutline(character, false)
+    end)
+end)
+
+workspace.DescendantAdded:Connect(function(descendant)
+    if descendant:IsA("Model") and findHumanoidRootPart(descendant) then
+        applyHitboxToNPCs()
+    end
+end)
