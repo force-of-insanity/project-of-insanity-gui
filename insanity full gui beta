@@ -1,0 +1,210 @@
+-- Generated using RoadToGlory's Converter v1.1 (RoadToGlory#9879)
+
+-- Instances:
+local Converted = {
+    ["_ScreenGui"] = Instance.new("ScreenGui"),
+    ["_Frame"] = Instance.new("Frame"),
+    ["_TextLabel"] = Instance.new("TextLabel"),
+    ["_TextBox"] = Instance.new("TextBox"),
+    ["_TextButton"] = Instance.new("TextButton"),
+    ["_TextBox2"] = Instance.new("TextBox"),
+    ["_TextButton2"] = Instance.new("TextButton"), -- Spin Fling button
+    ["_TextBox3"] = Instance.new("TextBox"), -- Empty TextBox3
+    ["_TextButton3"] = Instance.new("TextButton"), -- No script
+    ["_LocalScript"] = Instance.new("LocalScript"),
+    ["_UIDragDetector"] = Instance.new("UIDragDetector"),
+}
+
+-- Properties:
+
+Converted["_ScreenGui"].ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+Converted["_ScreenGui"].Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")  -- Change to PlayerGui for JJSpilot
+Converted["_ScreenGui"].ResetOnSpawn = false  -- Prevent resetting on respawn
+
+Converted["_Frame"].BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+Converted["_Frame"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+Converted["_Frame"].BorderSizePixel = 0
+Converted["_Frame"].Position = UDim2.new(0.208641976, 0, 0.26429674, 0)
+Converted["_Frame"].Size = UDim2.new(0, 387, 0, 207)
+Converted["_Frame"].Parent = Converted["_ScreenGui"]
+
+Converted["_TextLabel"].Font = Enum.Font.SourceSansBold
+Converted["_TextLabel"].Text = "E force insanity gui"
+Converted["_TextLabel"].TextColor3 = Color3.fromRGB(35, 39, 255)
+Converted["_TextLabel"].TextSize = 37
+Converted["_TextLabel"].TextYAlignment = Enum.TextYAlignment.Bottom
+Converted["_TextLabel"].BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+Converted["_TextLabel"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+Converted["_TextLabel"].BorderSizePixel = 0
+Converted["_TextLabel"].Size = UDim2.new(0, 387, 0, 35)
+Converted["_TextLabel"].Parent = Converted["_Frame"]
+
+Converted["_TextBox"].Font = Enum.Font.SourceSans
+Converted["_TextBox"].Text = "Enter player's name"
+Converted["_TextBox"].TextColor3 = Color3.fromRGB(35, 39, 255)
+Converted["_TextBox"].TextSize = 14
+Converted["_TextBox"].BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+Converted["_TextBox"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+Converted["_TextBox"].BorderSizePixel = 0
+Converted["_TextBox"].Position = UDim2.new(0, 0, 0.202898547, 0)
+Converted["_TextBox"].Size = UDim2.new(0, 114, 0, 28)
+Converted["_TextBox"].Parent = Converted["_Frame"]
+
+Converted["_TextButton"].Font = Enum.Font.SourceSans
+Converted["_TextButton"].Text = "Teleport to selected player"
+Converted["_TextButton"].TextColor3 = Color3.fromRGB(35, 39, 255)
+Converted["_TextButton"].TextSize = 14
+Converted["_TextButton"].BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+Converted["_TextButton"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+Converted["_TextButton"].BorderSizePixel = 0
+Converted["_TextButton"].Position = UDim2.new(0, 0, 0.371980667, 0)
+Converted["_TextButton"].Size = UDim2.new(0, 114, 0, 28)
+Converted["_TextButton"].Parent = Converted["_Frame"]
+
+Converted["_TextBox2"].Font = Enum.Font.SourceSans
+Converted["_TextBox2"].Text = "Insert walk speed"
+Converted["_TextBox2"].TextColor3 = Color3.fromRGB(35, 39, 255)
+Converted["_TextBox2"].TextSize = 14
+Converted["_TextBox2"].BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+Converted["_TextBox2"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+Converted["_TextBox2"].BorderSizePixel = 0
+Converted["_TextBox2"].Position = UDim2.new(0.705426335, 0, 0.202898547, 0)
+Converted["_TextBox2"].Size = UDim2.new(0, 114, 0, 28)
+Converted["_TextBox2"].Name = "TextBox2"
+Converted["_TextBox2"].Parent = Converted["_Frame"]
+
+Converted["_TextButton2"].Font = Enum.Font.SourceSans
+Converted["_TextButton2"].Text = "Spin Fling"
+Converted["_TextButton2"].TextColor3 = Color3.fromRGB(35, 39, 255)
+Converted["_TextButton2"].TextSize = 14
+Converted["_TextButton2"].BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+Converted["_TextButton2"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+Converted["_TextButton2"].BorderSizePixel = 0
+Converted["_TextButton2"].Position = UDim2.new(0.351421177, 0, 0.202898547, 0)  -- Updated position
+Converted["_TextButton2"].Size = UDim2.new(0, 114, 0, 28)
+Converted["_TextButton2"].Parent = Converted["_Frame"]
+
+Converted["_TextBox3"].Font = Enum.Font.SourceSans
+Converted["_TextBox3"].Text = ""
+Converted["_TextBox3"].TextColor3 = Color3.fromRGB(35, 39, 255)
+Converted["_TextBox3"].TextSize = 14
+Converted["_TextBox3"].BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+Converted["_TextBox3"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+Converted["_TextBox3"].BorderSizePixel = 0
+Converted["_TextBox3"].Position = UDim2.new(0.705426335, 0, 0.371980667, 0)  -- Updated position
+Converted["_TextBox3"].Size = UDim2.new(0, 114, 0, 28)
+Converted["_TextBox3"].Parent = Converted["_Frame"]
+
+Converted["_UIDragDetector"].Parent = Converted["_Frame"]
+
+-- Fake Script Section:
+local function XJTQIL_fake_script() -- Fake Script: 
+    -- Fake Script Body
+end
+coroutine.wrap(XJTQIL_fake_script)()
+
+-- Fling Script for TextButton2 (Spin Fling)
+local flingButton = Converted["_TextButton2"]  -- Spin Fling button
+local player = game.Players.LocalPlayer
+
+-- Function to fling players (like Infinite Yield's fling)
+local function flingPlayer(targetPlayer)
+    local character = targetPlayer.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local humanoidRootPart = character.HumanoidRootPart
+        local direction = (humanoidRootPart.Position - player.Character.HumanoidRootPart.Position).unit
+        local force = Instance.new("BodyVelocity")
+        
+        -- Set up the force to fling the player
+        force.MaxForce = Vector3.new(100000, 100000, 100000)  -- High force value to ensure it works
+        force.Velocity = direction * 150  -- Fling strength (increased to make it stronger)
+        force.P = 10000  -- Change P value to increase responsiveness
+        
+        -- Parent the force to the humanoid root part of the target player
+        force.Parent = humanoidRootPart
+
+        -- Remove the BodyVelocity after a short time to stop the fling (0.2 seconds)
+        game.Debris:AddItem(force, 0.2)  -- Clean up the force after 0.2 seconds
+    else
+        warn("Target player is missing a HumanoidRootPart!")
+    end
+end
+
+-- Detect when the Spin Fling button is clicked
+flingButton.MouseButton1Click:Connect(function()
+    local playerName = Converted["_TextBox3"].Text  -- Get the player name from TextBox3
+    local targetPlayer = game.Players:FindFirstChild(playerName)
+
+    if targetPlayer then
+        -- Call the fling function if the player is found
+        flingPlayer(targetPlayer)
+        print("Flung player: " .. playerName)
+    else
+        print("Player not found!")
+    end
+end)
+
+-- Teleportation Script (for TextButton and TextBox)
+local function teleportToPlayer()
+    local textBox = Converted["_TextBox"]
+    local player = game.Players.LocalPlayer
+    local function teleport(targetPlayer)
+        local targetCharacter = targetPlayer.Character
+        if targetCharacter then
+            local targetRoot = targetCharacter:WaitForChild("HumanoidRootPart")
+            player.Character:SetPrimaryPartCFrame(targetRoot.CFrame)
+        else
+            warn("Target player's character not loaded!")
+        end
+    end
+
+    -- Button to teleport to selected player
+    Converted["_TextButton"].MouseButton1Click:Connect(function()
+        local playerName = textBox.Text
+        local targetPlayer = game.Players:FindFirstChild(playerName)
+        if targetPlayer then
+            teleport(targetPlayer)
+            print("Teleporting to player: " .. playerName)
+        else
+            print("Player not found!")
+        end
+    end)
+end
+
+-- Walk Speed Script (for TextBox2)
+local function SpeedScript()
+    local textBox2 = Converted["_TextBox2"]
+    local player = game.Players.LocalPlayer
+    local function setWalkSpeed(character)
+        local humanoid = character:WaitForChild("Humanoid")
+        
+        -- Listen for focus lost on the second textbox to update walk speed
+        textBox2.FocusLost:Connect(function(enterPressed)
+            if enterPressed then
+                local newWalkSpeed = tonumber(textBox2.Text)
+                if newWalkSpeed then
+                    humanoid.WalkSpeed = newWalkSpeed
+                    print("WalkSpeed changed to:", newWalkSpeed)
+                else
+                    print("Please enter a valid number.")
+                end
+            end
+        end)
+    end
+
+    -- Apply the speed script to the player's character and listen for respawns
+    player.CharacterAdded:Connect(function(character)
+        setWalkSpeed(character)
+    end)
+
+    -- If the character is already loaded (in case of an already existing character on the first load)
+    if player.Character then
+        setWalkSpeed(player.Character)
+    end
+end
+
+-- Run the walk speed script
+coroutine.wrap(SpeedScript)()
+
+-- Run the teleportation script
+coroutine.wrap(teleportToPlayer)()
