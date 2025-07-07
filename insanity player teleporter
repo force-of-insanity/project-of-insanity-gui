@@ -1,0 +1,40 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- GUI references
+local screenGui = player:WaitForChild("PlayerGui"):WaitForChild("TeleportGUI")
+local displayNameTextBox = screenGui:WaitForChild("DisplayNameInput")
+local teleportButton = screenGui:WaitForChild("TeleportButton")
+
+teleportButton.MouseButton1Click:Connect(function()
+    local targetDisplayName = displayNameTextBox.Text
+    if targetDisplayName == "" then
+        warn("Please enter a display name.")
+        return
+    end
+    
+    -- Try to find the player by display name
+    local targetPlayer = nil
+    for _, otherPlayer in pairs(Players:GetPlayers()) do
+        if otherPlayer.DisplayName:lower() == targetDisplayName:lower() then
+            targetPlayer = otherPlayer
+            break
+        end
+    end
+    
+    if targetPlayer then
+        local targetCharacter = targetPlayer.Character
+        if targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart") then
+            -- Teleport to the other player's HumanoidRootPart
+            local targetPosition = targetCharacter.HumanoidRootPart.Position
+            -- Set our character's position to the target position
+            player.Character:SetPrimaryPartCFrame(CFrame.new(targetPosition + Vector3.new(0, 3, 0)))
+            warn("Teleported to " .. targetDisplayName)
+        else
+            warn("Target player does not have a character.")
+        end
+    else
+        warn("Player with display name '" .. targetDisplayName .. "' not found.")
+    end
+end)
