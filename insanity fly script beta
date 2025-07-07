@@ -1,0 +1,55 @@
+local UIS = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+local flying = false
+local speed = 50
+
+local bodyGyro = Instance.new("BodyGyro")
+bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+bodyGyro.P = 10000
+
+local bodyVelocity = Instance.new("BodyVelocity")
+bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+
+-- GUI references (assuming these exist in StarterGui)
+local screenGui = player:WaitForChild("PlayerGui"):WaitForChild("FlyGUI")
+local speedTextBox = screenGui:WaitForChild("SpeedInput")
+local applySpeedButton = screenGui:WaitForChild("ApplySpeedButton")
+
+applySpeedButton.MouseButton1Click:Connect(function()
+	local inputSpeed = tonumber(speedTextBox.Text)
+	if inputSpeed and inputSpeed > 0 then
+		speed = inputSpeed
+		warn("Fly speed set to:", speed)
+	else
+		warn("Invalid speed input.")
+	end
+end)
+
+UIS.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+
+	if input.KeyCode == Enum.KeyCode.F then
+		flying = not flying
+
+		if flying then
+			bodyGyro.Parent = humanoidRootPart
+			bodyVelocity.Parent = humanoidRootPart
+
+			local runService = game:GetService("RunService")
+			runService:BindToRenderStep("FlyControl", Enum.RenderPriority.Character.Value, function()
+				local cam = workspace.CurrentCamera
+				bodyGyro.CFrame = cam.CFrame
+				bodyVelocity.Velocity = cam.CFrame.LookVector * speed
+			end)
+		else
+			bodyGyro.Parent = nil
+			bodyVelocity.Parent = nil
+			game:GetService("RunService"):UnbindFromRenderStep("FlyControl")
+		end
+	end
+end)
